@@ -1,0 +1,12 @@
+build/generated/
+build/intermediates/
+build/kotlin/
+build/tmp/
+build/outputs/apk/
+build/outputs/logs/
+build/outputs/mapping/release/missing_rules.txt
+build/outputs/mapping/release/seeds.txt
+build/outputs/mapping/release/usage.txt
+build/outputs/mapping/release/configuration.txt
+build/outputs/mapping/release/resources.txt
+build/outputs/sdk-dependencies
