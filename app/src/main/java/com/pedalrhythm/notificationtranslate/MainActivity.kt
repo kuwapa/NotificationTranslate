@@ -47,6 +47,10 @@ class MainActivity : AppCompatActivity() {
         binding.recyclerView.addItemDecoration(VerticalSpaceItemDecoration(8.toPx.toInt()))
         binding.recyclerView.layoutManager = LinearLayoutManager(this@MainActivity)
 
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            refreshData()
+        }
+
         refreshData()
 
         binding.deleteAllButton.setOnClickListener {
@@ -76,6 +80,8 @@ class MainActivity : AppCompatActivity() {
             Log.d("data", notifications.toString())
 
             withContext(Dispatchers.Main) {
+                binding.swipeRefreshLayout.isRefreshing = false
+
                 binding.recyclerView.adapter = NotificationsAdapter(this@MainActivity, notifications)
                 binding.emptyListTextView.visibility =
                     if (notifications.isEmpty()) {
