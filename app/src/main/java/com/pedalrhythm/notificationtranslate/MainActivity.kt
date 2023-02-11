@@ -1,11 +1,13 @@
 package com.pedalrhythm.notificationtranslate
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -148,20 +150,39 @@ class NotificationsAdapter(
                 val intent = Intent()
                 intent.action = Intent.ACTION_SEND
                 intent.putExtra(Intent.EXTRA_TEXT, msg.content)
-                intent.putExtra("key_text_input", "hello there")
-                intent.putExtra("key_text_output", "")
-                intent.putExtra("key_language_from", "en")
-                intent.putExtra("key_language_to", "jp")
-                intent.putExtra("key_suggest_translation", "")
-                intent.putExtra("key_from_floating_window", false)
+//                intent.putExtra("key_text_input", "hello there")
+//                intent.putExtra("key_text_output", "")
+//                intent.putExtra("key_language_from", "en")
+//                intent.putExtra("key_language_to", "jp")
+//                intent.putExtra("key_suggest_translation", "")
+//                intent.putExtra("key_from_floating_window", false)
                 intent.component = ComponentName(
                     "com.google.android.apps.translate",  //Change is here
                     //"com.google.android.apps.translate.HomeActivity"));
                     "com.google.android.apps.translate.TranslateActivity"
                 )
                 startActivity(context, intent, null)
+
             } catch (e: ActivityNotFoundException) {
-                Toast.makeText(context, "Sorry, No Google Translation Installed", Toast.LENGTH_SHORT).show()
+                (context as Activity).showMaterialDialog(
+                    "Install Google Translate",
+                    "Install the Google translate app for text translation",
+                    { _, _ ->
+                        val packageName = "com.google.android.apps.translate"
+                        try {
+                            Log.d("", "onOpenPlayStore $packageName")
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=${packageName}"))
+                            startActivity(context, intent, null)
+                        } catch (e: ActivityNotFoundException) {
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=${packageName}"))
+                            startActivity(context, intent, null)
+                        }
+                    },
+                    "Install",
+                    null,
+                    "",
+                    false
+                )
             }
         }
     }
