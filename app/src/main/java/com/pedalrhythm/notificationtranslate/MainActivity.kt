@@ -1,16 +1,55 @@
 package com.pedalrhythm.notificationtranslate
 
+import android.content.ActivityNotFoundException
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat.startActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.room.Room
+import com.pedalrhythm.notificationtranslate.databinding.ActivityMainBinding
+import com.pedalrhythm.notificationtranslate.databinding.MsgLogItemBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
+
+        val db = Room.databaseBuilder(
+            applicationContext,
+            AppDatabase::class.java, "database-name"
+        ).build()
+        val notificationDao = db.notificationDao()
+
+        CoroutineScope(Dispatchers.IO).launch { // do your background tasks here
+            val notifications: List<NotificationEntity> = notificationDao.getAll()
+            Log.d("data", notifications.toString())
+
+            withContext(Dispatchers.Main) { //do tasks on the main thread that you want with that data
+                binding.recyclerView.layoutManager = LinearLayoutManager(this@MainActivity)
+                binding.recyclerView.adapter = NotificationsAdapter(this@MainActivity, notifications)
+            }
+        }
     }
 
     override fun onStart() {
@@ -42,4 +81,52 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+}
+
+class NotificationsAdapter(val context: Context,
+                           private val notificationsList: List<NotificationEntity>) :
+    RecyclerView.Adapter<NotificationsAdapter.ViewHolder>() {
+
+    inner class ViewHolder(val binding: MsgLogItemBinding) : RecyclerView.ViewHolder(binding.root)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val binding = MsgLogItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val msg = notificationsList[position]
+        holder.binding.fromTextView.text = msg.sender
+        holder.binding.contentTextView.text = msg.content
+        holder.binding.timeTextView.text = dateEpochToString(msg.time)
+
+        holder.binding.translateButton.setOnClickListener {
+            try {
+                val intent = Intent()
+                intent.action = Intent.ACTION_SEND
+                intent.putExtra(Intent.EXTRA_TEXT, "hello beautiful")
+                intent.putExtra("key_text_input", "hello there")
+                intent.putExtra("key_text_output", "")
+                intent.putExtra("key_language_from", "en")
+                intent.putExtra("key_language_to", "jp")
+                intent.putExtra("key_suggest_translation", "")
+                intent.putExtra("key_from_floating_window", false)
+                intent.component = ComponentName(
+                    "com.google.android.apps.translate",  //Change is here
+                    //"com.google.android.apps.translate.HomeActivity"));
+                    "com.google.android.apps.translate.TranslateActivity"
+                )
+                startActivity(context, intent, null)
+            } catch (e: ActivityNotFoundException) {
+                Toast.makeText(context, "Sorry, No Google Translation Installed", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    override fun getItemCount(): Int = notificationsList.size
+}
+
+fun dateEpochToString(time: Long): String {
+    val formatter = SimpleDateFormat("h:mm a")
+    return formatter.format(time)
 }
