@@ -3,11 +3,13 @@ package com.pedalrhythm.notificationtranslate
 import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
+import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.provider.Settings
 import android.text.Spanned
 import android.text.SpannedString
+import android.util.TypedValue
 import android.view.KeyEvent
 import android.view.View
 import android.widget.TextView
@@ -143,3 +145,8 @@ fun Context.isNotificationsAccessEnabled(): Boolean {
     }
     return false
 }
+
+val Number.toPx get() = TypedValue.applyDimension(
+    TypedValue.COMPLEX_UNIT_DIP,
+    this.toFloat(),
+    Resources.getSystem().displayMetrics)

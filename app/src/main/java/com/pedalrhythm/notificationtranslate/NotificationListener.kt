@@ -31,13 +31,14 @@ class NotificationListener : NotificationListenerService() {
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
         if (sbn?.packageName == "com.whatsapp") {
 
+            Log.d("notification_data", sbn.notification.extras.toString())
             val sender = sbn.notification.extras.getString("android.title")
             val msg = sbn.notification.extras.getString("android.text")
 
             CoroutineScope(Dispatchers.IO).launch { // do your background tasks here
                 notificationDao.insert(
                     NotificationEntity(
-                        sender!!, msg!!, System.currentTimeMillis() / 1000
+                        sender!!.toString(), msg!!.toString(), System.currentTimeMillis() / 1000
                     )
                 )
             }

@@ -14,7 +14,7 @@ data class NotificationEntity(
 
 @Dao
 interface NotificationDao {
-    @Query("SELECT * FROM notification")
+    @Query("SELECT * FROM notification ORDER BY time DESC")
     fun getAll(): List<NotificationEntity>
 
     @Insert

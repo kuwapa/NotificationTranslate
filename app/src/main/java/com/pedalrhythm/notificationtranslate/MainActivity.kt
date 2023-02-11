@@ -1,5 +1,6 @@
 package com.pedalrhythm.notificationtranslate
 
+import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Context
@@ -41,11 +42,12 @@ class MainActivity : AppCompatActivity() {
         ).build()
         val notificationDao = db.notificationDao()
 
-        CoroutineScope(Dispatchers.IO).launch { // do your background tasks here
+        CoroutineScope(Dispatchers.IO).launch {
             val notifications: List<NotificationEntity> = notificationDao.getAll()
             Log.d("data", notifications.toString())
 
-            withContext(Dispatchers.Main) { //do tasks on the main thread that you want with that data
+            withContext(Dispatchers.Main) {
+                binding.recyclerView.addItemDecoration(VerticalSpaceItemDecoration(8.toPx.toInt()))
                 binding.recyclerView.layoutManager = LinearLayoutManager(this@MainActivity)
                 binding.recyclerView.adapter = NotificationsAdapter(this@MainActivity, notifications)
             }
@@ -83,8 +85,9 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-class NotificationsAdapter(val context: Context,
-                           private val notificationsList: List<NotificationEntity>) :
+class NotificationsAdapter(
+    private val context: Context,
+    private val notificationsList: List<NotificationEntity>) :
     RecyclerView.Adapter<NotificationsAdapter.ViewHolder>() {
 
     inner class ViewHolder(val binding: MsgLogItemBinding) : RecyclerView.ViewHolder(binding.root)
@@ -126,6 +129,7 @@ class NotificationsAdapter(val context: Context,
     override fun getItemCount(): Int = notificationsList.size
 }
 
+@SuppressLint("SimpleDateFormat")
 fun dateEpochToString(time: Long): String {
     val formatter = SimpleDateFormat("h:mm a")
     return formatter.format(time)
