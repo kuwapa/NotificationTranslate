@@ -9,6 +9,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -29,6 +30,7 @@ import java.text.SimpleDateFormat
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var notificationDao: NotificationDao
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,16 +42,47 @@ class MainActivity : AppCompatActivity() {
             applicationContext,
             AppDatabase::class.java, "database-name"
         ).build()
-        val notificationDao = db.notificationDao()
+        notificationDao = db.notificationDao()
 
+        binding.recyclerView.addItemDecoration(VerticalSpaceItemDecoration(8.toPx.toInt()))
+        binding.recyclerView.layoutManager = LinearLayoutManager(this@MainActivity)
+
+        refreshData()
+
+        binding.deleteAllButton.setOnClickListener {
+            showMaterialDialog(
+                "Delete all notifications",
+                "Are you sure you want to delete all saved notifications?",
+                { _, _ ->
+                    CoroutineScope(Dispatchers.IO).launch {
+                        notificationDao.deleteAll()
+                        withContext(Dispatchers.Main) {
+                            refreshData()
+                            Toast.makeText(this@MainActivity, "All notifications deleted", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                },
+                "Delete All",
+                { dialog, _ -> dialog.dismiss() },
+                "Cancel",
+                false
+            )
+        }
+    }
+
+    private fun refreshData() {
         CoroutineScope(Dispatchers.IO).launch {
             val notifications: List<NotificationEntity> = notificationDao.getAll()
             Log.d("data", notifications.toString())
 
             withContext(Dispatchers.Main) {
-                binding.recyclerView.addItemDecoration(VerticalSpaceItemDecoration(8.toPx.toInt()))
-                binding.recyclerView.layoutManager = LinearLayoutManager(this@MainActivity)
                 binding.recyclerView.adapter = NotificationsAdapter(this@MainActivity, notifications)
+                binding.emptyListTextView.visibility =
+                    if (notifications.isEmpty()) {
+                        View.VISIBLE
+                    } else {
+                        View.GONE
+                    }
             }
         }
     }
@@ -87,7 +120,8 @@ class MainActivity : AppCompatActivity() {
 
 class NotificationsAdapter(
     private val context: Context,
-    private val notificationsList: List<NotificationEntity>) :
+    private val notificationsList: List<NotificationEntity>
+) :
     RecyclerView.Adapter<NotificationsAdapter.ViewHolder>() {
 
     inner class ViewHolder(val binding: MsgLogItemBinding) : RecyclerView.ViewHolder(binding.root)
@@ -107,7 +141,7 @@ class NotificationsAdapter(
             try {
                 val intent = Intent()
                 intent.action = Intent.ACTION_SEND
-                intent.putExtra(Intent.EXTRA_TEXT, "hello beautiful")
+                intent.putExtra(Intent.EXTRA_TEXT, msg.content)
                 intent.putExtra("key_text_input", "hello there")
                 intent.putExtra("key_text_output", "")
                 intent.putExtra("key_language_from", "en")

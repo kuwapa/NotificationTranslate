@@ -21,7 +21,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/medium_font"
-            android:textIsSelectable="true"
             android:textSize="15sp"
             tools:text="Sender name" />
 
@@ -30,7 +29,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/fromTextView"
-            android:textIsSelectable="true"
             android:textSize="13sp"
             android:typeface="monospace"
             tools:text="23:34" />
@@ -58,7 +56,6 @@
             android:padding="8dp"
             android:text="Translate"
             android:textColor="@color/accent"
-            android:textIsSelectable="true"
             android:textSize="15sp"
             tools:ignore="HardcodedText" />
 
