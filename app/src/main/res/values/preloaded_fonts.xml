@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <array name="preloaded_fonts" translatable="false">
-        <item>@font/ubuntu_light</item>
+        <item>@font/regular_font</item>
+        <item>@font/bold_font</item>
+        <item>@font/light_font</item>
+        <item>@font/medium_font</item>
     </array>
 </resources>

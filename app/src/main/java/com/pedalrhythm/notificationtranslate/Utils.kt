@@ -1,9 +1,11 @@
 package com.pedalrhythm.notificationtranslate
 
 import android.app.Activity
+import android.content.Context
 import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.provider.Settings
 import android.text.Spanned
 import android.text.SpannedString
 import android.view.KeyEvent
@@ -129,4 +131,15 @@ fun Activity.showMaterialDialogWithSpan(
 
 fun View.show() {
     visibility = View.VISIBLE
+}
+
+//check notification access setting is enabled or not
+fun Context.isNotificationsAccessEnabled(): Boolean {
+    try {
+        return Settings.Secure.getString(contentResolver, "enabled_notification_listeners")
+            .contains(packageName)
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+    return false
 }

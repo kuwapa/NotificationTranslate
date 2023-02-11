@@ -11,6 +11,7 @@ android {
         applicationId "com.pedalrhythm.notificationtranslate"
         minSdk 21
         targetSdk 32
+        compileSdk 33
         versionCode 1
         versionName "1.0"
 
