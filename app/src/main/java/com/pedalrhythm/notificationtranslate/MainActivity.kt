@@ -150,15 +150,8 @@ class NotificationsAdapter(
                 val intent = Intent()
                 intent.action = Intent.ACTION_SEND
                 intent.putExtra(Intent.EXTRA_TEXT, msg.content)
-//                intent.putExtra("key_text_input", "hello there")
-//                intent.putExtra("key_text_output", "")
-//                intent.putExtra("key_language_from", "en")
-//                intent.putExtra("key_language_to", "jp")
-//                intent.putExtra("key_suggest_translation", "")
-//                intent.putExtra("key_from_floating_window", false)
                 intent.component = ComponentName(
-                    "com.google.android.apps.translate",  //Change is here
-                    //"com.google.android.apps.translate.HomeActivity"));
+                    "com.google.android.apps.translate",
                     "com.google.android.apps.translate.TranslateActivity"
                 )
                 startActivity(context, intent, null)
