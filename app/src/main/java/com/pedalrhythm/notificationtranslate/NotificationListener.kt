@@ -27,21 +27,23 @@ class NotificationListener : NotificationListenerService() {
     private val ignoreMessages = arrayListOf(
         "Ongoing video call",
         "Ongoing voice call",
-        "Ringing...",
-        "Calling...",
+        "Ringing…",
+        "Calling…",
         "Missed voice call",
         "Missed video call",
         "Incoming voice call",
         "Incoming video call",
         "Checking for new messages",
-        "Call on hold"
+        "Call on hold",
+        "\uD83D\uDCF7 Photo"
     )
 
     private val regexList = arrayListOf(
-        "^[0-9]* missed voice calls$",
-        "^[0-9]* missed video calls$",
-        "^[0-9]* new messages$",
-        "^\\d* messages from \\d* chats$"
+        "^\\d* missed voice calls$",
+        "^\\d* missed video calls$",
+        "^\\d* new messages$",
+        "^\\d* messages from \\d* chats$",
+        "^\uD83C\uDFA5 Video \\(\\d*:\\d*\\)$",
     )
 
     private fun matchesAnyRegex(string: String): Boolean {
@@ -59,6 +61,13 @@ class NotificationListener : NotificationListenerService() {
             Log.d("notification_data", sbn.notification.extras.toString())
             val sender = sbn.notification.extras.getString("android.title")!!.toString()
             val content = sbn.notification.extras.getString("android.text")!!.toString()
+
+            if (sender.matches("^Downloading \\d* videos$".toRegex())
+                || sender == "WhatsApp"
+                || sender == "Backup in progress"
+            ) {
+                return
+            }
 
             if (ignoreMessages.contains(content) || matchesAnyRegex(content)) {
                 return

@@ -185,6 +185,6 @@ class NotificationsAdapter(
 
 @SuppressLint("SimpleDateFormat")
 fun dateEpochToString(time: Long): String {
-    val formatter = SimpleDateFormat("h:mm a")
-    return formatter.format(time)
+    val formatter = SimpleDateFormat("h:mm a, d MMM")
+    return formatter.format(time * 1000)
 }
